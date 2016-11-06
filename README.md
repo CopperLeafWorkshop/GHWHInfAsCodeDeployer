@@ -1,5 +1,9 @@
-GitHubWebHook (GWH) Infrastructure As Code Deployer
+GitHubWebHook (GHWH) Infrastructure As Code Deployer
 ------------------------------------------------
+
+Developer Setup:
+Windows 10:
+    Install "Windows Subsystem for Linux"
 
  1. Deploy this to AWS
  2. Setup github with this endpoint as a webhook

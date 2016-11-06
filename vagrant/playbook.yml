@@ -1,0 +1,9 @@
+---
+- hosts: all
+  sudo: yes
+  gather_facts: yes
+  roles:
+    - user
+    - common
+    #- python
+    #- deployer

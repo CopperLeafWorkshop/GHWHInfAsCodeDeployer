@@ -1,0 +1,3 @@
+# pull roles folder from ..\ansible
+roles 
+.vagrant
