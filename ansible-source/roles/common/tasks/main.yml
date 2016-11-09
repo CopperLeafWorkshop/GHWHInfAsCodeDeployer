@@ -4,29 +4,23 @@
     register: epel_installed
     ignore_errors: true
     changed_when: false
+    
   - name: install EPEL
     yum:
       pkg: epel-release
       state: installed
+      
   - name: clean yum metadata on first run
     shell: /usr/bin/yum clean all
-    when: epel_installed|failed
+    
   - name: upgrade all packages on first run
     yum:
       name: '*'
       state: latest
-    when: epel_installed|failed
 
   - name: Install Common Packages
     register: commoninstalled
     yum: name={{ item }} update_cache=yes state=latest
     with_items:
       - wget
-      - gcc
       - vim
-
-  - name: Set up authorized_keys for the centos user
-    authorized_key: user=centos key="{{ item }}"
-    with_file:
-      - public_keys/rob.pub
-      - public_keys/kyle.pub

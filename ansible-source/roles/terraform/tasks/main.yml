@@ -1,0 +1,22 @@
+---    
+  - name: Download Terraform
+    get_url: 
+      url: https://releases.hashicorp.com/terraform/0.7.9/terraform_0.7.9_linux_amd64.zip
+      dest: /tmp/terraform_0.7.9_linux_amd64.zip
+    become: yes
+    become_user: centos
+    register: download_terraform
+
+  - name: Creates directory
+    file: path=/usr/local/bin state=directory recurse=yes
+    register: bin_directory_created
+    
+  - name: Decompress Terraform
+    unarchive: 
+      src: /tmp/terraform_0.7.9_linux_amd64.zip
+      dest: /usr/local/bin
+      copy: no
+    when: 
+      - download_terraform|success
+      - bin_directory_created|success
+    register: decompress_terraform

@@ -1,3 +1,11 @@
 ---
   - name: Creating Centos User
-    user: name=centos
+    user: name=centos state=present
+    register: centos_user_exists
+
+  - name: Set up authorized_keys for the centos user
+    authorized_key: user=centos key="{{ item }}"
+    with_file:
+      - public_keys/rob.pub
+      - public_keys/kyle.pub
+    when: centos_user_exists|success

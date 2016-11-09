@@ -1,9 +1,13 @@
 ---
 - hosts: all
-  sudo: yes
+  become: yes
   gather_facts: yes
   roles:
-    - user
     - common
-    #- python
+    - user
+    - ansible
+    - packer
+    - terraform
+    - python 
     #- deployer
+    
