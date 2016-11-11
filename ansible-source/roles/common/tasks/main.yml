@@ -20,7 +20,9 @@
 
   - name: Install Common Packages
     register: commoninstalled
-    yum: name={{ item }} update_cache=yes state=latest
+    yum: 
+      name: "{{ item }}"
+      update_cache: yes 
+      state: present
     with_items:
-      - wget
       - vim
