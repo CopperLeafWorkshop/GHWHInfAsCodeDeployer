@@ -1,0 +1,13 @@
+---    
+  - name: Install Python3
+    yum: 
+      name: "{{ item }}" 
+      state: present
+    with_items:
+      - python34 
+      - python-pip
+      
+  - name: Update pip
+    pip:
+      name: "pip"
+      state: latest

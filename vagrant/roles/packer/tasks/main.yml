@@ -1,0 +1,16 @@
+---    
+  - name: Download Packer
+    get_url: 
+      url: https://releases.hashicorp.com/packer/0.11.0/packer_0.11.0_linux_amd64.zip
+      dest: /tmp/packer_0.11.0_linux_amd64.zip
+    become: yes
+    become_user: centos
+
+  - name: Creates directory
+    file: path=/usr/local/bin state=directory recurse=yes
+    
+  - name: Decompress Packer
+    unarchive: 
+      src: /tmp/packer_0.11.0_linux_amd64.zip
+      dest: /usr/local/bin
+      copy: no

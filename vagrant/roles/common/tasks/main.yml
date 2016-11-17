@@ -1,0 +1,26 @@
+---
+  - name: check if EPEL is installed
+    shell: /usr/bin/rpmquery epel-release
+    register: epel_installed
+    ignore_errors: true
+    changed_when: false
+
+  - name: clean yum metadata on first run
+    shell: /usr/bin/yum clean all
+    
+  - name: upgrade all packages on first run
+    yum:
+      name: '*'
+      state: latest
+      update_cache: yes 
+
+  - name: install EPEL
+    yum:
+      pkg: epel-release
+      state: installed
+      
+  - name: Install Common Packages
+    register: commoninstalled
+    yum: 
+      name: vim
+      state: present
