@@ -1,26 +1,43 @@
 ---
-  - name: check if EPEL is installed
-    shell: /usr/bin/rpmquery epel-release
-    register: epel_installed
-    ignore_errors: true
-    changed_when: false
-
   - name: clean yum metadata on first run
-    shell: /usr/bin/yum clean all
+    command: /usr/bin/yum clean all
+    when: first_run == true
     
   - name: upgrade all packages on first run
     yum:
       name: '*'
       state: latest
       update_cache: yes 
+    when: first_run == true
+
+  - name: check if EPEL is installed
+    command: /usr/bin/rpmquery epel-release
+    register: epel_installed
+    ignore_errors: true
+    changed_when: false
 
   - name: install EPEL
     yum:
       pkg: epel-release
       state: installed
+    when: epel_installed|failed
       
-  - name: Install Common Packages
-    register: commoninstalled
-    yum: 
-      name: vim
-      state: present
+  - name: install yum packages
+    yum: name={{ item }} state=present
+    with_items:
+      - ansible
+      - vim
+      - python34 
+      - python-pip
+      
+  - name: Update pip
+    pip:
+      name: "pip"
+      state: latest
+    when: first_run == true
+      
+  - name: install pip packages
+    pip: name={{ item }} state=present
+    with_items:
+      - flask
+      

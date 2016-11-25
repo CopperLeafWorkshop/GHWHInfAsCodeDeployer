@@ -4,5 +4,8 @@
       src: deployer.py
       dest: ~/deployer.py
       
-  - name: Start Deployer
-    shell: python deployer.py
+  #- name: Start Deployer Directly
+  #  shell: python ~/deployer.py
+    
+  #- name: Start Deployer
+  #  shell: gunicorn --bind 0.0.0.0:8000 wsgi

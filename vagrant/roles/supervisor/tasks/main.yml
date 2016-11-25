@@ -1,0 +1,53 @@
+---
+  - name: install supervisor
+    pip: 
+      name: supervisor 
+      state: present
+  
+  
+  - name: configure supervisord
+    command: /usr/bin/echo_supervisord_conf > {{supervisor.config.file}}
+    
+  - name: backup default configuration
+    shell: cp {{supervisor.config.file}} {{supervisor.config.default}} creates={{supervisor.config.default}}
+  
+  - name: prepare necessary directories
+    file: path={{item}} state=directory recurse=yes
+    with_items:
+      - "{{supervisor.log.dir}}"
+      - "{{supervisor.config.dir}}"
+      - "{{supervisor.runtime.dir}}"
+  
+  - name: configure runtime and log
+    ini_file: dest={{supervisor.config.file}}
+              section={{item.section}}
+              option={{item.option}}
+              value={{item.value}}
+    with_items:
+        - { section: unix_http_server, option: file, value: "{{supervisor.runtime.dir}}/{{supervisor.runtime.socket}}" }
+        - { section: supervisorctl, option: serverurl, value: "unix://{{supervisor.runtime.dir}}/{{supervisor.runtime.socket}}" }
+        - { section: supervisord, option: pidfile, value: "{{supervisor.runtime.dir}}/{{supervisor.runtime.pidfile}}" }
+        - { section: supervisord, option: nodaemon, value: "{{supervisor.runtime.nodaemon}}" }
+        - { section: supervisord, option: logfile, value: "{{supervisor.log.dir}}/{{supervisor.log.file}}" }
+        - { section: supervisord, option: loglevel, value: "{{supervisor.log.level}}" }
+        
+  - name: tell supervisor to include relative configurations directory
+    ini_file: dest={{supervisor.config.file}}
+              section=include
+              option=files
+              value={{supervisor.config.dir}}/*.ini
+              state=present
+  
+  - name: configure web ui status checking server
+    ini_file: dest={{supervisor.config.dir}}/{{supervisor.http.file}}
+              section=inet_http_server
+              option={{item.key}}
+              value={{item.value}}
+              state=present
+    with_dict: supervisor.http
+        
+  - name: make sure supervisord is running and up-to-date
+    shell: echo Magic...
+    notify:
+      - run supervisord
+      - reread supervisord config

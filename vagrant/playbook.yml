@@ -2,15 +2,20 @@
 - hosts: all
   become: yes
   gather_facts: yes
+  vars:
+    project_name: "Deployer"
+    project_path: "/home/centos/"
+    server_domain_or_IP: "127.0.0.1"
+    first_run: false
   roles:
-    - common
     - user
-    #- ansible
+    - common
+    - supervisor
+    #- gunicorn
+    #- nginx
+    #- deployer
+    
     #- packer
     #- terraform
-    - python 
-    #- nginx
-    #- gunicorn
-    - flask
-    - deployer
+    
     

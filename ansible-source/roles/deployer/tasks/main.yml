@@ -1,8 +1,0 @@
----
-  - name: Install Deployer
-    copy: 
-      src: deployer.py
-      dest: ~/deployer.py
-      
-  - name: Start Deployer Service
-    shell: python3 deployer.py localhost 8888
