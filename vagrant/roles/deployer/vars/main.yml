@@ -1,0 +1,7 @@
+deployer:
+  app:
+    dir: /opt/deployer
+    
+  config:
+    user: centos
+  

@@ -10,9 +10,9 @@
   roles:
     - user
     - common
+    - deployer
     - web
     #- nginx
-    #- deployer
     
     #- packer
     #- terraform

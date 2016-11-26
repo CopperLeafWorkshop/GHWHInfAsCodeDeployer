@@ -1,11 +1,15 @@
----
+--- 
+  - name: prepare necessary directories
+    file: 
+      path: "{{item}}"
+      state: directory 
+      recurse: yes
+      owner: "{{deployer.config.user}}"
+    with_items:
+      - "{{deployer.app.dir}}"
+  
   - name: Install Deployer
     copy: 
       src: deployer.py
-      dest: ~/deployer.py
+      dest: "{{deployer.app.dir}}/deployer.py"
       
-  #- name: Start Deployer Directly
-  #  shell: python ~/deployer.py
-    
-  #- name: Start Deployer
-  #  shell: gunicorn --bind 0.0.0.0:8000 wsgi
