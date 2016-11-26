@@ -1,0 +1,37 @@
+gunicorn:
+  app:
+    name: "deployer"
+    dir: /opt/deployer
+    
+  config:
+    dir: /opt/gunicorn/etc
+    executable: /opt/gunicorn/etc/run_gunicorn
+    user: centos
+    group: nobody
+    workers: 3
+    max_requests: 1
+  
+  runtime: 
+    dir: /opt/gunicorn/var/run
+    socket: /opt/gunicorn/var/run/gunicorn.sock
+    
+  log:
+    dir: /opt/gunicorn/var/log
+    file: /opt/gunicorn/var/log/supervisord.log
+    
+supervisor:
+  runtime:
+    dir: /opt/supervisor/var/run
+    socket: /opt/supervisor/var/run/supervisord.sock
+    pidfile: /opt/supervisor/var/run/supervisord.pid
+
+  config:
+    dir: /opt/supervisor/etc
+    file: /opt/supervisor/etc/supervisord.conf
+    default: /opt/supervisor/etc/default.supervisord.conf
+    user: centos
+
+  log:
+    dir: /opt/supervisor/var/log
+    file: /opt/supervisor/var/log/supervisord.log
+    

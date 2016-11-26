@@ -1,0 +1,62 @@
+---
+  - name: install gunicorn
+    pip:
+      name: gunicorn
+      state: present
+      
+  - name: prepare necessary directories
+    file: 
+      path: "{{item}}"
+      state: directory 
+      recurse: yes
+      owner: "{{gunicorn.config.user}}"
+    with_items:
+      - "{{gunicorn.app.dir}}"
+      - "{{gunicorn.config.dir}}"
+      - "{{gunicorn.runtime.dir}}"
+      - "{{gunicorn.log.dir}}"
+  
+      
+  - name: Create the Gunicorn script file
+    template: 
+      src: gunicorn_start.j2
+      dest: "{{gunicorn.config.executable}}"
+      owner: "{{ gunicorn.config.user }}"
+      group: "{{ gunicorn.config.group }}"
+      mode: 0755
+      backup: yes
+      
+          
+  - name: install supervisor
+    pip: 
+      name: supervisor 
+      state: present
+  
+  - name: prepare necessary directories
+    file:
+      path: "{{item}}"
+      state: directory 
+      recurse: yes
+      owner: "{{supervisor.config.user}}"
+    with_items:
+      - "{{supervisor.runtime.dir}}"
+      - "{{supervisor.config.dir}}"
+      - "{{supervisor.log.dir}}"
+  
+  - name: Create the Supervisor config file
+    template: src=supervisor_config.j2
+              dest="{{ supervisor.config.file }}"
+              backup=yes
+  
+  - name: Re-read the Supervisor config files
+    supervisorctl: 
+      name: "{{ gunicorn.app.name }}"
+      state: present
+      config: "{{ supervisor.config.file }}"
+  
+  - name: Restart Supervisor
+    supervisorctl: 
+      name: "{{ gunicorn.app.name }}"
+      state: restarted
+      config: "{{ supervisor.config.file }}"
+  

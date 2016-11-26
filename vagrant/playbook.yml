@@ -10,8 +10,7 @@
   roles:
     - user
     - common
-    - supervisor
-    #- gunicorn
+    - web
     #- nginx
     #- deployer
     
