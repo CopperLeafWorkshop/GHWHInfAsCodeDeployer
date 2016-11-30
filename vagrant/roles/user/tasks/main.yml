@@ -1,9 +1,20 @@
 ---
+  - name: Create Centos Group
+    become: yes
+    group: 
+      name: centos
+      state: present
+      
   - name: Creating Centos User
-    user: name=centos state=present
+    become: yes
+    user: 
+      name: centos 
+      state: present
+      group: centos
     register: centos_user_exists
 
   - name: Set up authorized_keys for the centos user
+    become: yes
     authorized_key: user=centos key="{{ item }}"
     with_file:
       - public_keys/rob.pub

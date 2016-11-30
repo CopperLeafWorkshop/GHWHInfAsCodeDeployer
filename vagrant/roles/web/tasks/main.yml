@@ -1,10 +1,13 @@
 ---
   - name: install gunicorn
+    become: true
     pip:
       name: gunicorn
       state: present
       
-  - name: prepare necessary directories
+  - name: prepare gunicorn directories
+    become: true
+    become_user: centos
     file: 
       path: "{{item}}"
       state: directory 
@@ -18,6 +21,8 @@
   
       
   - name: Create the Gunicorn script file
+    become: true
+    become_user: centos
     template: 
       src: gunicorn_start.j2
       dest: "{{gunicorn.config.executable}}"
@@ -28,11 +33,14 @@
       
           
   - name: install supervisor
+    become: true
     pip: 
       name: supervisor 
       state: present
   
-  - name: prepare necessary directories
+  - name: prepare supervisor directories
+    become: true
+    become_user: centos
     file:
       path: "{{item}}"
       state: directory 
@@ -44,17 +52,23 @@
       - "{{supervisor.log.dir}}"
   
   - name: Create the Supervisor config file
+    become: true
+    become_user: centos
     template: src=supervisor_config.j2
               dest="{{ supervisor.config.file }}"
               backup=yes
   
   - name: Re-read the Supervisor config files
+    become: true
+    become_user: centos
     supervisorctl: 
       name: "{{ gunicorn.app.name }}"
       state: present
       config: "{{ supervisor.config.file }}"
   
   - name: Restart Supervisor
+    become: true
+    become_user: centos
     supervisorctl: 
       name: "{{ gunicorn.app.name }}"
       state: restarted

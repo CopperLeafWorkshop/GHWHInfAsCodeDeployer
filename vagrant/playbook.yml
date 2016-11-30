@@ -1,12 +1,12 @@
 ---
 - hosts: all
-  become: yes
   gather_facts: yes
   vars:
     project_name: "Deployer"
     project_path: "/home/centos/"
     server_domain_or_IP: "127.0.0.1"
-    first_run: false
+    update_yum: false
+    update_pip: false
   roles:
     - user
     - common
