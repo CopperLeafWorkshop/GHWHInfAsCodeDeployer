@@ -1,17 +1,23 @@
 ---
-  - name: install gunicorn
+  - name: check user
     become: true
-    pip:
-      name: gunicorn
-      state: present
-      
+    become_user: centos
+    shell: whoami
+    
+  - name: check user
+    become: true
+    become_user: centos
+    command: whoami
+
+# Create needed Directories
+
   - name: prepare gunicorn directories
     become: true
     become_user: centos
     file: 
       path: "{{item}}"
       state: directory 
-      recurse: yes
+      recurse: no
       owner: "{{gunicorn.config.user}}"
     with_items:
       - "{{gunicorn.app.dir}}"
@@ -19,10 +25,36 @@
       - "{{gunicorn.runtime.dir}}"
       - "{{gunicorn.log.dir}}"
   
-      
-  - name: Create the Gunicorn script file
+  - name: prepare supervisord directories
     become: true
-    become_user: centos
+    file:
+      path: "{{item}}"
+      state: directory 
+      recurse: yes
+    with_items:
+      - "{{supervisor.config.dir}}"
+      - "{{supervisor.config.appdir}}"
+      - "{{supervisor.log.dir}}"
+
+# Install the Programs
+
+  - name: install gunicorn
+    become: true
+    pip:
+      name: gunicorn
+      state: present
+      
+  - name: install supervisor
+    become: true
+    pip: 
+      name: supervisor 
+      state: present
+      
+# Create the configuration files
+
+  - name: Create the Gunicorn run script
+    #become: true, aka sudo, to put the file there and have the permission to CHANGE the permissions on the file.
+    become: true 
     template: 
       src: gunicorn_start.j2
       dest: "{{gunicorn.config.executable}}"
@@ -31,46 +63,45 @@
       mode: 0755
       backup: yes
       
-          
-  - name: install supervisor
+  - name: Create the supervisor gunicorn config file
     become: true
-    pip: 
-      name: supervisor 
-      state: present
-  
-  - name: prepare supervisor directories
-    become: true
-    become_user: centos
-    file:
-      path: "{{item}}"
-      state: directory 
-      recurse: yes
-      owner: "{{supervisor.config.user}}"
-    with_items:
-      - "{{supervisor.runtime.dir}}"
-      - "{{supervisor.config.dir}}"
-      - "{{supervisor.log.dir}}"
-  
+    template: 
+      src: gunicorn.conf.j2
+      dest: "{{ supervisor.config.appdir }}/gunicorn.conf"   
+        
   - name: Create the Supervisor config file
     become: true
-    become_user: centos
-    template: src=supervisor_config.j2
-              dest="{{ supervisor.config.file }}"
-              backup=yes
+    template: 
+      src: supervisord.conf.j2
+      dest: "{{ supervisor.config.file }}"   
   
-  - name: Re-read the Supervisor config files
+  - name: Create the Supervisor service file
     become: true
-    become_user: centos
-    supervisorctl: 
-      name: "{{ gunicorn.app.name }}"
-      state: present
-      config: "{{ supervisor.config.file }}"
-  
-  - name: Restart Supervisor
+    template: 
+      src: supervisord.service.j2
+      dest: "/etc/systemd/system/supervisord.service"   
+
+# Start the Service
+      
+  - name: Ensure supervisord is running
     become: true
-    become_user: centos
-    supervisorctl: 
-      name: "{{ gunicorn.app.name }}"
-      state: restarted
-      config: "{{ supervisor.config.file }}"
-  
+    service:
+      name: supervisord
+      state: started
+
+ #- name: Re-read the Supervisor config files
+ #  become: true
+ #  supervisorctl: 
+ #    supervisorctl_path: /usr/bin/supervisorctl
+ #    name: "{{ gunicorn.app.name }}"
+ #    state: present
+ #    config: "{{ supervisor.config.file }}"
+ #
+ #- name: Restart Supervisor
+ #  become: true
+ #  supervisorctl: 
+ #    supervisorctl_path: /usr/bin/supervisorctl
+ #    name: "{{ gunicorn.app.name }}"
+ #    state: restarted
+ #    config: "{{ supervisor.config.file }}"
+ #

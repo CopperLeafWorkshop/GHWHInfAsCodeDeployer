@@ -1,0 +1,6 @@
+[program:{{ gunicorn.app.name }}]
+command = "{{ gunicorn.config.executable }}"
+user = {{ gunicorn.config.user }}
+stdout_logfile = {{ gunicorn.log.file }}
+redirect_stderr = true
+stdout_logfile_maxbytes=100MB

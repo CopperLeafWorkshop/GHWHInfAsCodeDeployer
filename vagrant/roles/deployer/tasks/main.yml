@@ -1,5 +1,7 @@
 --- 
-  - name: prepare necessary directories
+  - name: prepare deployer directories
+    become: true
+    become_user: centos
     file: 
       path: "{{item}}"
       state: directory 
@@ -9,7 +11,18 @@
       - "{{deployer.app.dir}}"
   
   - name: Install Deployer
+    become: true
+    become_user: centos
     copy: 
       src: deployer.py
       dest: "{{deployer.app.dir}}/deployer.py"
+      owner: "{{deployer.config.user}}"
+  
+  - name: Install Deployer wsgi
+    become: true
+    become_user: centos
+    copy: 
+      src: wsgi.py
+      dest: "{{deployer.app.dir}}/wsgi.py"
+      owner: "{{deployer.config.user}}"
       

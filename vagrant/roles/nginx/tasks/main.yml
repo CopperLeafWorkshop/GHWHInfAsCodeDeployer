@@ -1,11 +1,25 @@
 ---
   - name: Install nginx
+    become: true
     yum: 
       name: nginx
       state: present
       
   - name: Copy nginx configuration
+    become: true
     template: 
-        src: default.conf 
+        src: default.conf.j2
         dest: /etc/nginx/conf.d/default.conf
-    notify: restart nginx
+    
+  - name: Copy proxy params
+    become: true
+    file: 
+        src: proxy_params
+        dest: /etc/nginx/proxy_params
+    
+  - name: restart nginx
+    become: true
+    service: 
+      name: nginx 
+      state: restarted 
+      enabled: yes

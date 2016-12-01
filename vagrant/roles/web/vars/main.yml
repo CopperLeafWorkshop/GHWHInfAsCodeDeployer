@@ -5,9 +5,9 @@ gunicorn:
     
   config:
     dir: /opt/gunicorn/etc
-    executable: /opt/gunicorn/etc/run_gunicorn
+    executable: /opt/gunicorn/etc/run_gunicorn.sh
     user: centos
-    group: nobody
+    group: centos
     workers: 3
     max_requests: 1
   
@@ -21,17 +21,15 @@ gunicorn:
     
 supervisor:
   runtime:
-    dir: /opt/supervisor/var/run
-    socket: /opt/supervisor/var/run/supervisord.sock
-    pidfile: /opt/supervisor/var/run/supervisord.pid
+    socket: /var/run/supervisord.sock
+    pidfile: /var/run/supervisord.pid
 
   config:
-    dir: /opt/supervisor/etc
-    file: /opt/supervisor/etc/supervisord.conf
-    default: /opt/supervisor/etc/default.supervisord.conf
-    user: centos
+    dir: /etc/supervisor
+    file: /etc/supervisor/supervisord.conf
+    appdir: /etc/supervisor/conf.d
 
   log:
-    dir: /opt/supervisor/var/log
-    file: /opt/supervisor/var/log/supervisord.log
+    dir: /var/log/supervisor
+    file: /var/log/supervisor/supervisord.log
     

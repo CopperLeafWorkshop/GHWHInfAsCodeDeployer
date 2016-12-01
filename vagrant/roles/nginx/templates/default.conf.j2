@@ -4,6 +4,6 @@ server {
 
     location / {
         include proxy_params;
-        proxy_pass http://unix:{{ project_path }}deployer.sock;
+        proxy_pass http://unix:/opt/gunicorn/var/run/gunicorn.sock;
     }
 }
